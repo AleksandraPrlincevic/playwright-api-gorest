@@ -81,3 +81,32 @@ test('CanNot create a user with existing email', async({request})=>{
     expect(updatedUser.email).toEqual(newEmail);
     expect(updatedUser.id).toEqual(randomUserId);
   })
+   test('can replace a user', async ({request})=>{
+    const {users} = await apiHelper.getAllUsers(request);
+    const randomUser = apiHelper.getRandomUser(users);
+    const randomUserId = randomUser.id;
+    const changedUser = apiHelper.generateNewUser();
+
+    const {response, substituteUser} = await apiHelper.putUser(request, randomUserId, changedUser);
+
+    expect(response.status()).toBe(200);
+    expect(substituteUser.id).toEqual(randomUserId);
+    expect(substituteUser.name).toEqual(changedUser.name);
+    expect(substituteUser.email).toEqual(changedUser.email);
+    expect(substituteUser.gender).toEqual(changedUser.gender);
+    expect(substituteUser.status).toEqual(changedUser.status);
+   })
+    test('user can be deleted', async ({request})=> {
+      const {users} = await apiHelper.getAllUsers(request);
+      const randomUser = apiHelper.getRandomUser(users);
+      const randomUserId = randomUser.id;
+    
+      const response = await apiHelper.deleteUser(request, randomUserId);
+
+      expect(response.status()).toBe(204);
+      
+      const {response: response2} = await apiHelper.getOneUser(request, randomUserId);
+      const responseBody = await response2.json();
+      expect(response2.status()).toBe(404);
+      expect(responseBody.message).toContain("not found");
+    })

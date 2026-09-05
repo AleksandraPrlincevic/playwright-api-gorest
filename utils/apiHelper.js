@@ -25,7 +25,15 @@ export async function patchUser(request, userId, {data}) {
     const updatedUser = await response.json();
     return {response, updatedUser};
 }
-
+export async function putUser(request, userId, user){
+    const response = await request.put(`${USERS}/${userId}`, {data: user});
+    const substituteUser = await response.json();
+    return{response, substituteUser};
+}
+export async function deleteUser(request, userId) {
+    const response = await request.delete(`${USERS}/${userId}`);
+    return response;
+}
 //--------------data helpers----------------------------
 
 export function getRandomUser(users){
