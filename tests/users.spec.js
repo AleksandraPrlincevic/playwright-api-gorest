@@ -1,14 +1,13 @@
 
 import { test, expect } from '@playwright/test';
 import{USERS, POSTS} from '../utils/endpoints';
+import * as apiHelper from '../utils/apiHelper';
+import { faker } from '@faker-js/faker';
+import 'dotenv/config';
 
 test('canGetAllUsers', async ({ request }) => {
-    const response = await request.get(USERS);
-
+    const {response, users } = await apiHelper.getAllUsers(request);
     expect(response.status()).toBe(200);
-
-    const users = await response.json();
-
     expect(Array.isArray(users)).toBe(true);
     expect(users.length).toBeGreaterThan(0);
 
@@ -20,26 +19,65 @@ test('canGetAllUsers', async ({ request }) => {
 });
 
 test('canGetOneUser', async ({request}) => {
-  const response = await request.get(USERS);
+ const { response, users } = await apiHelper.getAllUsers(request);
   expect(response.status()).toBe(200);
-  const users = await response.json();
   expect(Array.isArray(users)).toBe(true);
 
-  function getRandomUser(users){
-    const randomUserIndex = Math.floor(Math.random()*users.length);
-    return users[randomUserIndex];
-  }
-  const randomUser = getRandomUser(users); 
+  const randomUser = apiHelper.getRandomUser(users); 
   const randomUserId = randomUser.id;
   const randomUserName = randomUser.name;
-  const randomUserEmail = randomUser.email;
+  const randomUserEmail =randomUser.email;
   
-  const response2 = await request.get(`${USERS}/${randomUserId}`)
+  const { response: response2, user: fetchedUser } = await apiHelper.getOneUser(request, randomUserId)
+  
   expect(response2.status()).toBe(200);
-  const user = await response2.json();
-
-  expect(user.name).toEqual(randomUserName);
-  expect(user.email).toEqual(randomUserEmail);
-  expect(user.id).toEqual(randomUserId);
-  
+  expect(fetchedUser.name).toEqual(randomUserName);
+  expect(fetchedUser.email).toEqual(randomUserEmail);
+  expect(fetchedUser.id).toEqual(randomUserId);
 })
+
+test('Can create new user', async({request}) => {
+  const newUser = apiHelper.generateNewUser();
+  const userName = newUser.name;
+  const userEmail = newUser.email;
+  const userGender = newUser.gender;
+  const userStatus = newUser.status;
+
+  const {response: response3, createdUser} = await apiHelper.createNewUser(request, newUser);
+
+  expect(response3.status()).toBe(201);
+  expect(createdUser).toHaveProperty('id');
+  expect(createdUser.name).toEqual(userName);
+  expect(createdUser.email).toEqual(userEmail);
+  expect(createdUser.gender).toEqual(userGender);
+  expect(createdUser.status).toEqual(userStatus);
+
+})
+
+test('CanNot create a user with existing email', async({request})=>{
+   const { response, users } = await apiHelper.getAllUsers(request);
+
+   const randomUser = apiHelper.getRandomUser(users); 
+   const randomUserEmail =randomUser.email;
+
+   const userWithExistingEmail = apiHelper.generateUserWithExistingEmail(randomUserEmail);
+
+   const {response: response2, createdUser} = await apiHelper.createNewUser(request, userWithExistingEmail);
+   const responseBody = await response2.json();
+
+   expect(response2.status()).toBe(422);
+   expect(responseBody[0].field).toContain("email");
+   expect(responseBody[0].message).toContain("taken");
+  })
+  
+  test('can change an email field of existing user', async({request})=>{
+    const {users} =  await apiHelper.getAllUsers(request);
+    const randomUser = apiHelper.getRandomUser(users);
+    const randomUserId = randomUser.id;
+    const newEmail = faker.internet.email();
+    const {response, updatedUser} = await apiHelper.patchUser(request, randomUserId, {data: {email: newEmail}});
+  
+    expect(response.status()).toBe(200);
+    expect(updatedUser.email).toEqual(newEmail);
+    expect(updatedUser.id).toEqual(randomUserId);
+  })
