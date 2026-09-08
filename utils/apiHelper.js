@@ -46,7 +46,11 @@ export async function createNewTodo(request, newTodo){
     const todo = await response.json();
     return {response, todo};
 }
-
+export async function getAllTodosFromOneUser(request, userId){
+    const response = await request.get(`${USERS}/${userId}/${TODOS}`);
+    const usersTodos = await response.json();
+    return {response, usersTodos};
+}
 //--------------data helpers for users----------------------------
 
 export function getRandomUser(users){

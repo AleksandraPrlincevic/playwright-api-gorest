@@ -52,8 +52,7 @@ test ('can get all todos', async ({request})=>{
       const {todos} = await apiHelper.getAllTodos(request); 
       expect(todos.length).toBeGreaterThan(0);
       const userId = todos[0].user_id;
-      const response = await request.get(`${USERS}/${userId}/${TODOS}`);
-      const usersTodos =  await response.json();
+      const {response, usersTodos} =  await apiHelper.getAllTodosFromOneUser(request, userId);
       expect(response.status()).toBe(200);
       expect(Array.isArray(usersTodos)).toBe(true);
       expect(usersTodos.length).toBeGreaterThan(0);
