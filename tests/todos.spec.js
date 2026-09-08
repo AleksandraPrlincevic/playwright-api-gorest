@@ -60,3 +60,15 @@ test ('can get all todos', async ({request})=>{
          expect(todo.user_id).toEqual(userId);
       })
     })
+
+   test (`canNot create a todo with invalid status`, async ({request})=>{
+      const {users} = await apiHelper.getAllUsers(request);
+      const randomUser = apiHelper.getRandomUser(users);
+      const userId = randomUser.id;
+      const invalidTodo = apiHelper.createTodoWithInvalidStatus(userId);
+      const {response, todo} = await apiHelper.createTodoForUserWithInvalidStatus(request, userId, invalidTodo);
+
+      expect(response.status()).toBe(422);
+      expect(todo[0].field).toContain("status");
+      expect(todo[0].message).toContain("can't be blank, can be pending or completed");
+ } )

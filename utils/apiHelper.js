@@ -51,6 +51,13 @@ export async function getAllTodosFromOneUser(request, userId){
     const usersTodos = await response.json();
     return {response, usersTodos};
 }
+export async function createTodoForUserWithInvalidStatus(request, userId, invalidTodo){
+    const response = await request.post(`${USERS}/${userId}/${TODOS}`, {data: invalidTodo});
+    const todo = await response.json();
+    return {response, todo};
+}
+    
+
 //--------------data helpers for users----------------------------
 
 export function getRandomUser(users){
@@ -91,5 +98,15 @@ export function createTodo(userId){
         title: faker.lorem.sentence(),
         due_on: dueDate.toISOString(),
         status: faker.helpers.arrayElement(["pending", "completed"])
+    }
+ }
+export function createTodoWithInvalidStatus(userId){
+    const dueDate = new Date();
+    dueDate.setDate(dueDate.getDate() + 7);
+    return {
+        user_id: userId,
+        title: faker.lorem.sentence(),
+        due_on: dueDate.toISOString(),
+        status: "invalid"
     }
  }
