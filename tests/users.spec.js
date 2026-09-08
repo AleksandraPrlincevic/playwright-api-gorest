@@ -5,7 +5,7 @@ import * as apiHelper from '../utils/apiHelper';
 import { faker } from '@faker-js/faker';
 import 'dotenv/config';
 
-test('canGetAllUsers', async ({ request }) => {
+test('can get all users', async ({ request }) => {
     const {response, users } = await apiHelper.getAllUsers(request);
     expect(response.status()).toBe(200);
     expect(Array.isArray(users)).toBe(true);
@@ -18,7 +18,7 @@ test('canGetAllUsers', async ({ request }) => {
     });
 });
 
-test('canGetOneUser', async ({request}) => {
+test('can get one user', async ({request}) => {
  const { response, users } = await apiHelper.getAllUsers(request);
   expect(response.status()).toBe(200);
   expect(Array.isArray(users)).toBe(true);
@@ -96,7 +96,7 @@ test('CanNot create a user with existing email', async({request})=>{
     expect(substituteUser.gender).toEqual(changedUser.gender);
     expect(substituteUser.status).toEqual(changedUser.status);
    })
-    test('user can be deleted', async ({request})=> {
+    test('can delete a user', async ({request})=> {
       const {users} = await apiHelper.getAllUsers(request);
       const randomUser = apiHelper.getRandomUser(users);
       const randomUserId = randomUser.id;

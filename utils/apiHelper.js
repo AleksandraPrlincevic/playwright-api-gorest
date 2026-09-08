@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import{USERS, POSTS} from './endpoints';
+import{USERS, POSTS, TODOS} from './endpoints';
 import { faker } from '@faker-js/faker';
 import { configDotenv } from 'dotenv';
 
@@ -34,7 +34,20 @@ export async function deleteUser(request, userId) {
     const response = await request.delete(`${USERS}/${userId}`);
     return response;
 }
-//--------------data helpers----------------------------
+
+//---------------asyncs for todos-----------------------
+export async function getAllTodos(request){
+   const response = await request.get(TODOS);
+   const todos = await response.json();
+   return {response, todos};
+}
+export async function createNewTodo(request, newTodo){
+    const response = await request.post(TODOS, {data: newTodo});
+    const todo = await response.json();
+    return {response, todo};
+}
+
+//--------------data helpers for users----------------------------
 
 export function getRandomUser(users){
     const randomUserIndex = Math.floor(Math.random()*users.length);
@@ -54,5 +67,25 @@ export function generateUserWithExistingEmail(existingEmail){
     newUser.email = existingEmail;
     return newUser;
 }
+ //--------------------data helpers for todos--------------------
 
-
+ export function createTodoWithoutStatus(userId){
+    const dueDate = new Date();
+    dueDate.setDate(dueDate.getDate() + 7);
+    return {
+        user_id: userId,
+        title: faker.lorem.sentence(),
+        due_on: dueDate.toISOString(),
+        //namerno izostavljen status
+    }
+ }
+export function createTodo(userId){
+    const dueDate = new Date();
+    dueDate.setDate(dueDate.getDate() + 7);
+    return {
+        user_id: userId,
+        title: faker.lorem.sentence(),
+        due_on: dueDate.toISOString(),
+        status: faker.helpers.arrayElement(["pending", "completed"])
+    }
+ }
