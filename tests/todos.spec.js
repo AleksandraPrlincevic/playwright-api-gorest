@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import{USERS, POSTS, TODOS} from '../utils/endpoints';
-import * as apiHelper from '../utils/apiHelper';
+import * as apiHelper from '../utils/apiHelper.js';
 import { faker } from '@faker-js/faker';
 import 'dotenv/config';
 
@@ -24,7 +24,7 @@ test ('can get all todos', async ({request})=>{
     const randomUser = apiHelper.getRandomUser(users);
     const userId = randomUser.id;
    
-    const newTodo = apiHelper.createTodoWithoutStatus(userId);
+    const newTodo = apiHelper.generateTodoWithoutStatus(userId);
     const {response: response2, todo} = await apiHelper.createNewTodo(request, newTodo);
     
     expect(response2.status()).toBe(422);
@@ -37,7 +37,7 @@ test ('can get all todos', async ({request})=>{
     const randomUser = apiHelper.getRandomUser(users);
     const userId = randomUser.id;
 
-    const newTodo = apiHelper.createTodo(userId);
+    const newTodo = apiHelper.generateTodo(userId);
     const {response, todo} = await apiHelper.createNewTodo(request, newTodo);
 
     expect(response.status()).toBe(201);
@@ -65,7 +65,7 @@ test ('can get all todos', async ({request})=>{
       const {users} = await apiHelper.getAllUsers(request);
       const randomUser = apiHelper.getRandomUser(users);
       const userId = randomUser.id;
-      const newTodo = apiHelper.createTodoWithoutUserId();
+      const newTodo = apiHelper.generateTodoWithoutUserId();
       newTodo.status = "invalid";
       const {response, todo} = await apiHelper. createTodoViaUserEndpoint(request, userId, newTodo);
 
@@ -73,3 +73,25 @@ test ('can get all todos', async ({request})=>{
       expect(todo[0].field).toContain("status");
       expect(todo[0].message).toContain("can't be blank, can be pending or completed");
  } )
+ test( 'can delete a todo', async ({request})=>{
+   const {users} = await apiHelper.getAllUsers(request);
+   const randomUser = apiHelper.getRandomUser(users);
+   const userId = randomUser.id;
+
+   const newTodo = apiHelper.generateTodo(userId);
+   const {response, todo} = await apiHelper.createNewTodo(request, newTodo);
+   const todoId = todo.id;
+   
+   expect(response.status()).toBe(201);
+   expect(todo.user_id).toEqual(userId);
+   expect(todo.id).toBeGreaterThan(0);
+
+   const {response: response2} = await apiHelper.deleteTodo(request, todoId);
+
+   expect(response2.status()).toBe(204);
+     
+   const {response: response3, todos: todos2} = await apiHelper.getAllTodos(request);
+      todos2.forEach(todo=>{
+      expect(todo.id).not.toBe(todoId);
+     })
+ })

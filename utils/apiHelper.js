@@ -47,7 +47,7 @@ export async function createNewTodo(request, newTodo){
     return {response, todo};
 }
 export async function getAllTodosFromOneUser(request, userId){
-    const response = await request.get(`${USERS}/${userId}/${TODOS}`);
+    const response = await request.get(`${USERS}/${userId}/${TODOS}`); 
     const usersTodos = await response.json();
     return {response, usersTodos};
 }
@@ -56,7 +56,10 @@ export async function createTodoViaUserEndpoint(request, userId, newTodo){
     const todo = await response.json();
     return {response, todo};
 }
-    
+export async function deleteTodo(request, todoId) {
+    const response = await request.delete(`${TODOS}/${todoId}`);
+    return {response};
+}    
 
 //--------------data helpers for users----------------------------
 
@@ -80,7 +83,7 @@ export function generateUserWithExistingEmail(existingEmail){
 }
  //--------------------data helpers for todos--------------------
 
- export function createTodoWithoutStatus(userId){
+ export function generateTodoWithoutStatus(userId){
     const dueDate = new Date();
     dueDate.setDate(dueDate.getDate() + 7);
     return {
@@ -90,7 +93,7 @@ export function generateUserWithExistingEmail(existingEmail){
         //namerno izostavljen status
     }
  }
-export function createTodo(userId){
+export function generateTodo(userId){
     const dueDate = new Date();
     dueDate.setDate(dueDate.getDate() + 7);
     return {
@@ -100,7 +103,7 @@ export function createTodo(userId){
         status: faker.helpers.arrayElement(["pending", "completed"])
     }
  }
-export function createTodoWithoutUserId(){ //for user endpoint 
+export function generateTodoWithoutUserId(){ // via user endpoint 
     const dueDate = new Date();
     dueDate.setDate(dueDate.getDate() + 7);
     return {

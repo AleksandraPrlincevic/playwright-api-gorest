@@ -1,7 +1,7 @@
 
 import { test, expect } from '@playwright/test';
 import{USERS, POSTS} from '../utils/endpoints';
-import * as apiHelper from '../utils/apiHelper';
+import * as apiHelper from '../utils/apiHelper.js';
 import { faker } from '@faker-js/faker';
 import 'dotenv/config';
 
@@ -55,8 +55,7 @@ test('Can create new user', async({request}) => {
 })
 
 test('CanNot create a user with existing email', async({request})=>{
-   const { response, users } = await apiHelper.getAllUsers(request);
-
+   const { users } = await apiHelper.getAllUsers(request);
    const randomUser = apiHelper.getRandomUser(users); 
    const randomUserEmail =randomUser.email;
 
