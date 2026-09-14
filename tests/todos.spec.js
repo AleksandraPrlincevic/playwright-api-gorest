@@ -65,8 +65,9 @@ test ('can get all todos', async ({request})=>{
       const {users} = await apiHelper.getAllUsers(request);
       const randomUser = apiHelper.getRandomUser(users);
       const userId = randomUser.id;
-      const invalidTodo = apiHelper.createTodoWithInvalidStatus(userId);
-      const {response, todo} = await apiHelper.createTodoForUserWithInvalidStatus(request, userId, invalidTodo);
+      const newTodo = apiHelper.createTodoWithoutUserId();
+      newTodo.status = "invalid";
+      const {response, todo} = await apiHelper. createTodoViaUserEndpoint(request, userId, newTodo);
 
       expect(response.status()).toBe(422);
       expect(todo[0].field).toContain("status");

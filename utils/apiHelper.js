@@ -51,8 +51,8 @@ export async function getAllTodosFromOneUser(request, userId){
     const usersTodos = await response.json();
     return {response, usersTodos};
 }
-export async function createTodoForUserWithInvalidStatus(request, userId, invalidTodo){
-    const response = await request.post(`${USERS}/${userId}/${TODOS}`, {data: invalidTodo});
+export async function createTodoViaUserEndpoint(request, userId, newTodo){
+    const response = await request.post(`${USERS}/${userId}/${TODOS}`, {data: newTodo});
     const todo = await response.json();
     return {response, todo};
 }
@@ -100,13 +100,12 @@ export function createTodo(userId){
         status: faker.helpers.arrayElement(["pending", "completed"])
     }
  }
-export function createTodoWithInvalidStatus(userId){
+export function createTodoWithoutUserId(){ //for user endpoint 
     const dueDate = new Date();
     dueDate.setDate(dueDate.getDate() + 7);
     return {
-        user_id: userId,
         title: faker.lorem.sentence(),
         due_on: dueDate.toISOString(),
-        status: "invalid"
+        status: faker.helpers.arrayElement(["pending", "completed"])
     }
  }
