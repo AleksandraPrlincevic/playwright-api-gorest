@@ -1,7 +1,6 @@
 import { test, expect } from '@playwright/test';
 import{USERS, POSTS, TODOS} from '../utils/endpoints';
 import * as apiHelper from '../utils/apiHelper.js';
-import { faker } from '@faker-js/faker';
 import 'dotenv/config';
 
 test ('can get all todos', async ({request})=>{
@@ -46,6 +45,9 @@ test ('can get all todos', async ({request})=>{
     expect(new Date(todo.due_on).getTime()).toEqual(new Date(newTodo.due_on).getTime());
     expect(todo.status).toBe(newTodo.status);
     expect(todo.id).toBeGreaterThan(0);
+    
+    const {todos} = await apiHelper.getAllTodos(request);
+    expect(todos.some(t => t.id === todo.id)).toBe(true);;
     })
 
     test ('can get all todos from one user', async ({request})=>{
@@ -60,11 +62,30 @@ test ('can get all todos', async ({request})=>{
          expect(todo.user_id).toEqual(userId);
       })
     })
+   test (`can create a todo via user endpoint`, async ({request})=>{ 
+      const {users} = await apiHelper.getAllUsers(request);
+      const randomUser = apiHelper.getRandomUser(users);
+      const userId = randomUser.id;
 
+      const newTodo = apiHelper.generateTodoWithoutUserId();
+      const {response, todo} = await apiHelper. createTodoViaUserEndpoint(request, userId, newTodo);
+     
+      expect(response.status()).toBe(201);
+      expect(todo.user_id).toEqual(userId);
+      expect(todo.title).toEqual(newTodo.title);
+      expect(new Date(todo.due_on).getTime()).toEqual(new Date(newTodo.due_on).getTime());
+      expect(todo.status).toBe(newTodo.status);
+      expect(todo.id).toBeGreaterThan(0);
+    
+      const {todos} = await apiHelper.getAllTodos(request);
+      expect(todos.some(t => t.id === todo.id)).toBe(true);
+
+   })
    test (`canNot create a todo with invalid status`, async ({request})=>{
       const {users} = await apiHelper.getAllUsers(request);
       const randomUser = apiHelper.getRandomUser(users);
       const userId = randomUser.id;
+
       const newTodo = apiHelper.generateTodoWithoutUserId();
       newTodo.status = "invalid";
       const {response, todo} = await apiHelper. createTodoViaUserEndpoint(request, userId, newTodo);
