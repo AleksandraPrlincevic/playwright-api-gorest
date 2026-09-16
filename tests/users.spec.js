@@ -55,15 +55,13 @@ test('Can create new user', async({request}) => {
 })
 
 test('CanNot create a user with existing email', async({request})=>{
-   const { users } = await apiHelper.getAllUsers(request);
-   const randomUser = apiHelper.getRandomUser(users); 
-   const randomUserEmail =randomUser.email;
+   const user = apiHelper.generateNewUser();
+   const {createdUser} = await apiHelper.createNewUser(request, user);
+   const existingEmail = createdUser.email;
 
-   const userWithExistingEmail = apiHelper.generateUserWithExistingEmail(randomUserEmail);
-
-   const {response: response2, createdUser} = await apiHelper.createNewUser(request, userWithExistingEmail);
-   const responseBody = await response2.json();
-
+   const userWithExistingEmail = apiHelper.generateUserWithExistingEmail(existingEmail);
+   const {response: response2, createdUser: responseBody} = await apiHelper.createNewUser(request, userWithExistingEmail);
+   
    expect(response2.status()).toBe(422);
    expect(responseBody[0].field).toContain("email");
    expect(responseBody[0].message).toContain("taken");
