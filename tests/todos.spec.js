@@ -116,3 +116,26 @@ test ('can get all todos', async ({request})=>{
       expect(todo.id).not.toBe(todoId);
      })
  })
+test('can patch a todo', async({request})=>{
+   const {users} = await apiHelper.getAllUsers(request);
+   const randomUser = apiHelper.getRandomUser(users);
+   const userId = randomUser.id;
+
+   const newTodo = apiHelper.generateTodo(userId);
+   const {response, todo} = await apiHelper.createNewTodo(request, newTodo);
+   const todoId = todo.id;
+   
+   expect(response.status()).toBe(201);
+   expect(todo.user_id).toEqual(userId);
+   expect(todo.id).toBeGreaterThan(0);
+
+   const data = apiHelper.changeTodoStatus(todo);
+   const {response: response2, todo: changedTodo } = await apiHelper.patchTodo(request, todoId, data);
+   
+   expect(response2.status()).toBe(200);
+   expect(changedTodo.status).not.toEqual(todo.status);
+   expect(changedTodo.id).toEqual(todo.id);
+   expect(changedTodo.user_id).toEqual(todo.user_id);
+   expect(changedTodo.title).toEqual(todo.title);
+   expect(changedTodo.due_on).toEqual(todo.due_on);
+})

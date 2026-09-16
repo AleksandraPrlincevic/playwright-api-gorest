@@ -59,7 +59,12 @@ export async function createTodoViaUserEndpoint(request, userId, newTodo){
 export async function deleteTodo(request, todoId) {
     const response = await request.delete(`${TODOS}/${todoId}`);
     return {response};
-}    
+}   
+export async function patchTodo(request, todoId, data) {
+    const response = await request.patch(`${TODOS}/${todoId}`, {data});
+    const todo = await response.json();
+    return {response, todo};
+}  
 
 //--------------data helpers for users----------------------------
 
@@ -111,4 +116,8 @@ export function generateTodoWithoutUserId(){ // via user endpoint
         due_on: dueDate.toISOString(),
         status: faker.helpers.arrayElement(["pending", "completed"])
     }
+ }
+ export function changeTodoStatus(todo){
+  const newStatus = todo.status === "pending" ? "completed": "pending" ;
+  return {status: newStatus};
  }
