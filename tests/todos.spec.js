@@ -19,9 +19,9 @@ test ('can get all todos', async ({request})=>{
    });
 })
  test ('canNot create a todo without status property', async({request})=>{
-    const {users} = await apiHelper.getAllUsers(request);
-    const randomUser = apiHelper.getRandomUser(users);
-    const userId = randomUser.id;
+   const user = apiHelper.generateNewUser();
+   const {createdUser} = await apiHelper.createNewUser(request, user);
+   const userId = createdUser.id;
    
     const newTodo = apiHelper.generateTodoWithoutStatus(userId);
     const {response: response2, todo} = await apiHelper.createNewTodo(request, newTodo);
@@ -32,9 +32,9 @@ test ('can get all todos', async ({request})=>{
  })
 
  test ('can create a todo', async ({request})=>{
-    const {users} = await apiHelper.getAllUsers(request);
-    const randomUser = apiHelper.getRandomUser(users);
-    const userId = randomUser.id;
+    const user = apiHelper.generateNewUser();
+    const {createdUser} = await apiHelper.createNewUser(request, user);
+    const userId = createdUser.id;
 
     const newTodo = apiHelper.generateTodo(userId);
     const {response, todo} = await apiHelper.createNewTodo(request, newTodo);
@@ -55,6 +55,7 @@ test ('can get all todos', async ({request})=>{
       expect(todos.length).toBeGreaterThan(0);
       const userId = todos[0].user_id;
       const {response, usersTodos} =  await apiHelper.getAllTodosFromOneUser(request, userId);
+
       expect(response.status()).toBe(200);
       expect(Array.isArray(usersTodos)).toBe(true);
       expect(usersTodos.length).toBeGreaterThan(0);
@@ -63,9 +64,9 @@ test ('can get all todos', async ({request})=>{
       })
     })
    test (`can create a todo via user endpoint`, async ({request})=>{ 
-      const {users} = await apiHelper.getAllUsers(request);
-      const randomUser = apiHelper.getRandomUser(users);
-      const userId = randomUser.id;
+      const user = apiHelper.generateNewUser();
+      const {createdUser} = await apiHelper.createNewUser(request, user);
+      const userId = createdUser.id;
 
       const newTodo = apiHelper.generateTodoWithoutUserId();
       const {response, todo} = await apiHelper. createTodoViaUserEndpoint(request, userId, newTodo);
@@ -82,9 +83,9 @@ test ('can get all todos', async ({request})=>{
 
    })
    test (`canNot create a todo with invalid status`, async ({request})=>{
-      const {users} = await apiHelper.getAllUsers(request);
-      const randomUser = apiHelper.getRandomUser(users);
-      const userId = randomUser.id;
+      const user = apiHelper.generateNewUser();
+      const {createdUser} = await apiHelper.createNewUser(request, user);
+      const userId = createdUser.id;
 
       const newTodo = apiHelper.generateTodoWithoutUserId();
       newTodo.status = "invalid";
@@ -95,9 +96,9 @@ test ('can get all todos', async ({request})=>{
       expect(todo[0].message).toContain("can't be blank, can be pending or completed");
  } )
  test( 'can delete a todo', async ({request})=>{
-   const {users} = await apiHelper.getAllUsers(request);
-   const randomUser = apiHelper.getRandomUser(users);
-   const userId = randomUser.id;
+   const user = apiHelper.generateNewUser();
+   const {createdUser} = await apiHelper.createNewUser(request, user);
+   const userId = createdUser.id;
 
    const newTodo = apiHelper.generateTodo(userId);
    const {response, todo} = await apiHelper.createNewTodo(request, newTodo);
@@ -117,9 +118,9 @@ test ('can get all todos', async ({request})=>{
      })
  })
 test('can patch a todo', async({request})=>{
-   const {users} = await apiHelper.getAllUsers(request);
-   const randomUser = apiHelper.getRandomUser(users);
-   const userId = randomUser.id;
+   const user = apiHelper.generateNewUser();
+   const {createdUser} = await apiHelper.createNewUser(request, user);
+   const userId = createdUser.id;
 
    const newTodo = apiHelper.generateTodo(userId);
    const {response, todo} = await apiHelper.createNewTodo(request, newTodo);

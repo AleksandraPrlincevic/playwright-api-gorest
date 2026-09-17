@@ -68,42 +68,47 @@ test('CanNot create a user with existing email', async({request})=>{
   })
   
   test('can change an email field of existing user', async({request})=>{
-    const {users} =  await apiHelper.getAllUsers(request);
-    const randomUser = apiHelper.getRandomUser(users);
-    const randomUserId = randomUser.id;
+    const user = apiHelper.generateNewUser();
+    const {createdUser} = await apiHelper.createNewUser(request, user);
+    const userId = createdUser.id;
+
     const newEmail = faker.internet.email();
-    const {response, updatedUser} = await apiHelper.patchUser(request, randomUserId, {data: {email: newEmail}});
+    const {response, updatedUser} = await apiHelper.patchUser(request, userId, {data: {email: newEmail}});
   
     expect(response.status()).toBe(200);
     expect(updatedUser.email).toEqual(newEmail);
-    expect(updatedUser.id).toEqual(randomUserId);
+    expect(updatedUser.id).toEqual(createdUser.id);
+    expect(updatedUser.gender).toEqual(createdUser.gender);
+    expect(updatedUser.status).toEqual(createdUser.status);
+    expect(updatedUser.name).toEqual(createdUser.name);
+    
   })
    test('can replace a user', async ({request})=>{
-    const {users} = await apiHelper.getAllUsers(request);
-    const randomUser = apiHelper.getRandomUser(users);
-    const randomUserId = randomUser.id;
+    const user = apiHelper.generateNewUser();
+    const {createdUser} = await apiHelper.createNewUser(request, user);
+    const userId = createdUser.id;
     const changedUser = apiHelper.generateNewUser();
 
-    const {response, substituteUser} = await apiHelper.putUser(request, randomUserId, changedUser);
+    const {response, substituteUser} = await apiHelper.putUser(request, userId, changedUser);
 
     expect(response.status()).toBe(200);
-    expect(substituteUser.id).toEqual(randomUserId);
+    expect(substituteUser.id).toEqual(userId);
     expect(substituteUser.name).toEqual(changedUser.name);
     expect(substituteUser.email).toEqual(changedUser.email);
     expect(substituteUser.gender).toEqual(changedUser.gender);
     expect(substituteUser.status).toEqual(changedUser.status);
    })
     test('can delete a user', async ({request})=> {
-      const {users} = await apiHelper.getAllUsers(request);
-      const randomUser = apiHelper.getRandomUser(users);
-      const randomUserId = randomUser.id;
+      const user = apiHelper.generateNewUser();
+      const {createdUser} = await apiHelper.createNewUser(request, user);
+      const userId = createdUser.id;
     
-      const response = await apiHelper.deleteUser(request, randomUserId);
+      const response = await apiHelper.deleteUser(request, userId);
 
       expect(response.status()).toBe(204);
       
-      const {response: response2} = await apiHelper.getOneUser(request, randomUserId);
-      const responseBody = await response2.json();
+      const {response: response2, user: responseBody} = await apiHelper.getOneUser(request, userId);
+      
       expect(response2.status()).toBe(404);
       expect(responseBody.message).toContain("not found");
     })
