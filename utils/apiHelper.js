@@ -65,6 +65,11 @@ export async function patchTodo(request, todoId, data) {
     const todo = await response.json();
     return {response, todo};
 }  
+export async function changeTodo(request, todoId, data) {
+    const response = await request.put(`${TODOS}/${todoId}`, {data});
+    const todo = await response.json();
+    return {response, todo};
+}  
 
 //--------------data helpers for users----------------------------
 

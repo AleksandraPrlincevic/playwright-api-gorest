@@ -82,6 +82,15 @@ test ('can get all todos', async ({request})=>{
       expect(todos.some(t => t.id === todo.id)).toBe(true);
 
    })
+   test('canNot create a todo with invalid user id', async({request})=>{
+     const userId = 99999999999;
+     const newTodo = apiHelper.generateTodo(userId);
+
+     const {response, todo: responseBody} = await apiHelper.createNewTodo(request, newTodo); 
+      expect(response.status()).toBe(422);
+      expect(responseBody[0].field).toContain("user");
+      expect(responseBody[0].message).toContain("must exist");
+   })
    test (`canNot create a todo with invalid status`, async ({request})=>{
       const user = apiHelper.generateNewUser();
       const {createdUser} = await apiHelper.createNewUser(request, user);
@@ -95,6 +104,8 @@ test ('can get all todos', async ({request})=>{
       expect(todo[0].field).toContain("status");
       expect(todo[0].message).toContain("can't be blank, can be pending or completed");
  } )
+ 
+
  test( 'can delete a todo', async ({request})=>{
    const user = apiHelper.generateNewUser();
    const {createdUser} = await apiHelper.createNewUser(request, user);
@@ -140,3 +151,17 @@ test('can patch a todo', async({request})=>{
    expect(changedTodo.title).toEqual(todo.title);
    expect(changedTodo.due_on).toEqual(todo.due_on);
 })
+
+ test('canNot change a todo with invalid todo id', async({request})=>{
+   const user = apiHelper.generateNewUser();
+   const {createdUser} = await apiHelper.createNewUser(request, user);
+   const userId = createdUser.id;
+
+   const newTodo = apiHelper.generateTodo(userId);
+   newTodo.id = 99999999999;
+   const todoId = newTodo.id;
+
+   const {response, todo: responseBody} = await apiHelper.changeTodo(request, todoId, newTodo); 
+   expect(response.status()).toBe(404);
+   expect(responseBody.message).toContain("Resource not found");
+   })

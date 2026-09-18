@@ -36,7 +36,7 @@ test('can get one user', async ({request}) => {
   expect(fetchedUser.id).toEqual(randomUserId);
 })
 
-test('Can create new user', async({request}) => {
+test('can create new user', async({request}) => {
   const newUser = apiHelper.generateNewUser();
   const userName = newUser.name;
   const userEmail = newUser.email;
@@ -54,7 +54,7 @@ test('Can create new user', async({request}) => {
 
 })
 
-test('CanNot create a user with existing email', async({request})=>{
+test('canNot create a user with existing email', async({request})=>{
    const user = apiHelper.generateNewUser();
    const {createdUser} = await apiHelper.createNewUser(request, user);
    const existingEmail = createdUser.email;
