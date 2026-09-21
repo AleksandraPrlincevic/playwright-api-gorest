@@ -152,7 +152,7 @@ test('can patch a todo', async({request})=>{
    expect(changedTodo.due_on).toEqual(todo.due_on);
 })
 
- test('canNot change a todo with invalid todo id', async({request})=>{
+ test('canNot replace a todo with invalid todo id', async({request})=>{
    const user = apiHelper.generateNewUser();
    const {createdUser} = await apiHelper.createNewUser(request, user);
    const userId = createdUser.id;
@@ -165,3 +165,4 @@ test('can patch a todo', async({request})=>{
    expect(response.status()).toBe(404);
    expect(responseBody.message).toContain("Resource not found");
    })
+   

@@ -1,5 +1,5 @@
-
-import { test, expect } from '@playwright/test';
+import { test } from'../utils/fixtures.js';
+import { expect } from '@playwright/test';
 import{USERS, POSTS} from '../utils/endpoints';
 import * as apiHelper from '../utils/apiHelper.js';
 import { faker } from '@faker-js/faker';
@@ -36,22 +36,15 @@ test('can get one user', async ({request}) => {
   expect(fetchedUser.id).toEqual(randomUserId);
 })
 
-test('can create new user', async({request}) => {
-  const newUser = apiHelper.generateNewUser();
-  const userName = newUser.name;
-  const userEmail = newUser.email;
-  const userGender = newUser.gender;
-  const userStatus = newUser.status;
+test('can create new user', async({createdUser: userFixture}) => {
+  const {response, newUser, createdUser} =  userFixture;
 
-  const {response: response3, createdUser} = await apiHelper.createNewUser(request, newUser);
-
-  expect(response3.status()).toBe(201);
+  expect(response.status()).toBe(201);
   expect(createdUser).toHaveProperty('id');
-  expect(createdUser.name).toEqual(userName);
-  expect(createdUser.email).toEqual(userEmail);
-  expect(createdUser.gender).toEqual(userGender);
-  expect(createdUser.status).toEqual(userStatus);
-
+  expect(createdUser.name).toEqual(newUser.name);
+  expect(createdUser.email).toEqual(newUser.email);
+  expect(createdUser.gender).toEqual(newUser.gender);
+  expect(createdUser.status).toEqual(newUser.status);
 })
 
 test('canNot create a user with existing email', async({request})=>{
