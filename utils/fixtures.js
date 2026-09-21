@@ -6,6 +6,7 @@ export const test = base.extend({
         const newUser = apiHelper.generateNewUser();
         const { response, createdUser } = await apiHelper.createNewUser(request, newUser);
         await use ({response, newUser, createdUser});
-        await apiHelper.deleteUser(request, createdUser.id);
+        const deleteResults = await apiHelper.deleteUser(request, createdUser.id);
+        console.log('cleanup- deleted user id:', createdUser.id, 'status: ', deleteResults.response.status())
     },
 });

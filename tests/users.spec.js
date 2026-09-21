@@ -38,7 +38,7 @@ test('can get one user', async ({request}) => {
 
 test('can create new user', async({createdUser: userFixture}) => {
   const {response, newUser, createdUser} =  userFixture;
-
+ console.log('test received createdUser with id:', createdUser.id)
   expect(response.status()).toBe(201);
   expect(createdUser).toHaveProperty('id');
   expect(createdUser.name).toEqual(newUser.name);

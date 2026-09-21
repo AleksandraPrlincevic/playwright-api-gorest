@@ -32,7 +32,7 @@ export async function putUser(request, userId, user){
 }
 export async function deleteUser(request, userId) {
     const response = await request.delete(`${USERS}/${userId}`);
-    return response;
+    return {response};
 }
 
 //---------------asyncs for todos-----------------------
