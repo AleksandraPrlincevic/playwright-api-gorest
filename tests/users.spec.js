@@ -34,22 +34,20 @@ test('can get one user', async ({request}) => {
   expect(fetchedUser.name).toEqual(randomUserName);
   expect(fetchedUser.email).toEqual(randomUserEmail);
   expect(fetchedUser.id).toEqual(randomUserId);
-})
+});
 
 test('can create new user', async({createdUser: userFixture}) => {
   const {response, newUser, createdUser} =  userFixture;
- console.log('test received createdUser with id:', createdUser.id)
   expect(response.status()).toBe(201);
   expect(createdUser).toHaveProperty('id');
   expect(createdUser.name).toEqual(newUser.name);
   expect(createdUser.email).toEqual(newUser.email);
   expect(createdUser.gender).toEqual(newUser.gender);
   expect(createdUser.status).toEqual(newUser.status);
-})
+});
 
-test('canNot create a user with existing email', async({request})=>{
-   const user = apiHelper.generateNewUser();
-   const {createdUser} = await apiHelper.createNewUser(request, user);
+test('canNot create a user with existing email', async({createdUser: userFixture, request})=>{
+   const {response, newUser, createdUser} = userFixture;
    const existingEmail = createdUser.email;
 
    const userWithExistingEmail = apiHelper.generateUserWithExistingEmail(existingEmail);
@@ -58,50 +56,46 @@ test('canNot create a user with existing email', async({request})=>{
    expect(response2.status()).toBe(422);
    expect(responseBody[0].field).toContain("email");
    expect(responseBody[0].message).toContain("taken");
-  })
+  });
   
-  test('can change an email field of existing user', async({request})=>{
-    const user = apiHelper.generateNewUser();
-    const {createdUser} = await apiHelper.createNewUser(request, user);
+  test('can change an email field of existing user', async({createdUser: userFixture, request})=>{
+    const {response, newUser, createdUser} = userFixture;
     const userId = createdUser.id;
 
     const newEmail = faker.internet.email();
-    const {response, updatedUser} = await apiHelper.patchUser(request, userId, {data: {email: newEmail}});
+    const {response: response2, updatedUser} = await apiHelper.patchUser(request, userId, {data: {email: newEmail}});
   
-    expect(response.status()).toBe(200);
+    expect(response2.status()).toBe(200);
     expect(updatedUser.email).toEqual(newEmail);
     expect(updatedUser.id).toEqual(createdUser.id);
     expect(updatedUser.gender).toEqual(createdUser.gender);
     expect(updatedUser.status).toEqual(createdUser.status);
     expect(updatedUser.name).toEqual(createdUser.name);
     
-  })
-   test('can replace a user', async ({request})=>{
-    const user = apiHelper.generateNewUser();
-    const {createdUser} = await apiHelper.createNewUser(request, user);
+  });
+   test('can replace a user', async ({createdUser: userFixture, request})=>{
+    const {response, newUser, createdUser} = userFixture;
     const userId = createdUser.id;
+
     const changedUser = apiHelper.generateNewUser();
+    const {response: response2, substituteUser} = await apiHelper.putUser(request, userId, changedUser);
 
-    const {response, substituteUser} = await apiHelper.putUser(request, userId, changedUser);
-
-    expect(response.status()).toBe(200);
+    expect(response2.status()).toBe(200);
     expect(substituteUser.id).toEqual(userId);
     expect(substituteUser.name).toEqual(changedUser.name);
     expect(substituteUser.email).toEqual(changedUser.email);
     expect(substituteUser.gender).toEqual(changedUser.gender);
     expect(substituteUser.status).toEqual(changedUser.status);
-   })
-    test('can delete a user', async ({request})=> {
-      const user = apiHelper.generateNewUser();
-      const {createdUser} = await apiHelper.createNewUser(request, user);
+   });
+    test('can delete a user', async ({createdUser: userFixture, request})=> {
+      const {response, newUser, createdUser} = userFixture;
       const userId = createdUser.id;
     
-      const response = await apiHelper.deleteUser(request, userId);
-
-      expect(response.status()).toBe(204);
+      const {response: response2} = await apiHelper.deleteUser(request, userId);
+      expect(response2.status()).toBe(204);
       
-      const {response: response2, user: responseBody} = await apiHelper.getOneUser(request, userId);
+      const {response: response3, user: responseBody} = await apiHelper.getOneUser(request, userId);
       
-      expect(response2.status()).toBe(404);
+      expect(response3.status()).toBe(404);
       expect(responseBody.message).toContain("not found");
-    })
+    });
