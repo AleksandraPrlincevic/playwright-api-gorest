@@ -36,7 +36,7 @@ test('can get one user', async ({request}) => {
   expect(fetchedUser.id).toEqual(randomUserId);
 });
 
-test('can create new user', async({createdUser: userFixture}) => {
+test('can create new user', async({userFixture}) => {
   const {response, newUser, createdUser} =  userFixture;
   expect(response.status()).toBe(201);
   expect(createdUser).toHaveProperty('id');
@@ -46,7 +46,7 @@ test('can create new user', async({createdUser: userFixture}) => {
   expect(createdUser.status).toEqual(newUser.status);
 });
 
-test('canNot create a user with existing email', async({createdUser: userFixture, request})=>{
+test('canNot create a user with existing email', async({userFixture, request})=>{
    const {response, newUser, createdUser} = userFixture;
    const existingEmail = createdUser.email;
 
@@ -58,7 +58,7 @@ test('canNot create a user with existing email', async({createdUser: userFixture
    expect(responseBody[0].message).toContain("taken");
   });
   
-  test('can change an email field of existing user', async({createdUser: userFixture, request})=>{
+  test('can change an email field of existing user', async({userFixture, request})=>{
     const {response, newUser, createdUser} = userFixture;
     const userId = createdUser.id;
 
@@ -73,7 +73,7 @@ test('canNot create a user with existing email', async({createdUser: userFixture
     expect(updatedUser.name).toEqual(createdUser.name);
     
   });
-   test('can replace a user', async ({createdUser: userFixture, request})=>{
+   test('can replace a user', async ({userFixture, request})=>{
     const {response, newUser, createdUser} = userFixture;
     const userId = createdUser.id;
 
@@ -87,7 +87,7 @@ test('canNot create a user with existing email', async({createdUser: userFixture
     expect(substituteUser.gender).toEqual(changedUser.gender);
     expect(substituteUser.status).toEqual(changedUser.status);
    });
-    test('can delete a user', async ({createdUser: userFixture, request})=> {
+    test('can delete a user', async ({userFixture, request})=> {
       const {response, newUser, createdUser} = userFixture;
       const userId = createdUser.id;
     
