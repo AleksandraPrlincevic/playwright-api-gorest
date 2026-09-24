@@ -1,6 +1,5 @@
 import { test } from'../utils/fixtures.js';
 import { expect } from '@playwright/test';
-import{USERS, POSTS} from '../utils/endpoints';
 import * as apiHelper from '../utils/apiHelper.js';
 import { faker } from '@faker-js/faker';
 import 'dotenv/config';
@@ -36,18 +35,21 @@ test('can get one user', async ({request}) => {
   expect(fetchedUser.id).toEqual(randomUserId);
 });
 
-test('can create new user', async({userFixture}) => {
-  const {response, newUser, createdUser} =  userFixture;
+test('can create new user', async({request}) => {
+  const newUser = apiHelper.generateNewUser();
+  const {response, createdUser} =  await apiHelper.createNewUser(request, newUser);
   expect(response.status()).toBe(201);
   expect(createdUser).toHaveProperty('id');
   expect(createdUser.name).toEqual(newUser.name);
   expect(createdUser.email).toEqual(newUser.email);
   expect(createdUser.gender).toEqual(newUser.gender);
   expect(createdUser.status).toEqual(newUser.status);
+  
+  await apiHelper.deleteUser(request, createdUser.id);
 });
 
 test('canNot create a user with existing email', async({userFixture, request})=>{
-   const {response, newUser, createdUser} = userFixture;
+   const {createdUser} = userFixture;
    const existingEmail = createdUser.email;
 
    const userWithExistingEmail = apiHelper.generateUserWithExistingEmail(existingEmail);
@@ -59,11 +61,11 @@ test('canNot create a user with existing email', async({userFixture, request})=>
   });
   
   test('can change an email field of existing user', async({userFixture, request})=>{
-    const {response, newUser, createdUser} = userFixture;
+    const {createdUser} = userFixture;
     const userId = createdUser.id;
 
     const newEmail = faker.internet.email();
-    const {response: response2, updatedUser} = await apiHelper.patchUser(request, userId, {data: {email: newEmail}});
+    const {response: response2, updatedUser} = await apiHelper.patchUser(request, userId, {email: newEmail});
   
     expect(response2.status()).toBe(200);
     expect(updatedUser.email).toEqual(newEmail);
@@ -74,7 +76,7 @@ test('canNot create a user with existing email', async({userFixture, request})=>
     
   });
    test('can replace a user', async ({userFixture, request})=>{
-    const {response, newUser, createdUser} = userFixture;
+    const {createdUser} = userFixture;
     const userId = createdUser.id;
 
     const changedUser = apiHelper.generateNewUser();
@@ -88,7 +90,7 @@ test('canNot create a user with existing email', async({userFixture, request})=>
     expect(substituteUser.status).toEqual(changedUser.status);
    });
     test('can delete a user', async ({userFixture, request})=> {
-      const {response, newUser, createdUser} = userFixture;
+      const {createdUser} = userFixture;
       const userId = createdUser.id;
     
       const {response: response2} = await apiHelper.deleteUser(request, userId);

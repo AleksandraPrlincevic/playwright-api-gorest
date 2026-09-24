@@ -20,8 +20,8 @@ export async function createNewUser(request, newUser) {
     const createdUser = await response.json();
     return {response, createdUser};
 }
-export async function patchUser(request, userId, {data}) {
-    const response = await request.patch(`${USERS}/${userId}`, {data});
+export async function patchUser(request, userId, changedProperties) {
+    const response = await request.patch(`${USERS}/${userId}`, {data: changedProperties});
     const updatedUser = await response.json();
     return {response, updatedUser};
 }
